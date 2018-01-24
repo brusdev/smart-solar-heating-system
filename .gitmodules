@@ -1,3 +1,4 @@
 [submodule "sensor/lib/libWakaamaEmb"]
 	path = sensor/lib/libWakaamaEmb
 	url = https://github.com/brusdev/libWakaamaEmb.git
+	branch = patch-esp8266
