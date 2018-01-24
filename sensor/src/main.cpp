@@ -39,7 +39,6 @@ void setup() {
 
     Serial.begin(9600);
 
-    //WiFi.begin("Ditron-Internet-Access", "Ditron.wifi01");
     WiFi.begin("BrusNet", "dommiccargiafra");
 
     Serial.println();
