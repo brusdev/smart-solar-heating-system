@@ -25,8 +25,10 @@
 #include "wakaama_object_utils.h"
 
 #include "led_object.h"
+#include "sensor_object.h"
 
-#define LWM2M_SERVER_ADDR "coap://192.168.10.189"
+#define LWM2M_SERVER_ADDR "coap://192.168.10.16"
+
 
 #define ONE_WIRE_BUS D3  // DS18B20 pin
 #define ONE_WIRE_MAX_DEV 15 //The maximum number of devices
@@ -111,8 +113,19 @@ void TempLoop(long now){
   }
 }
 
+static lwm2m_object_res_item_t* prv_find_ressource(lwm2m_object_meta_information_t* metaP, uint16_t id) {
+    for (int index = 0; index < metaP->ressources_len; index++) {
+        if (metaP->ressources[index].ressource_id == id) {
+            return &metaP->ressources[index];
+        }
+    }
+    
+    return NULL;
+}
 
+double* temp_value;
 lwm2m_context_t * client_context;
+
 void setup() {
     delay(3000);
 
@@ -157,6 +170,16 @@ void setup() {
     }
 
     // Create object
+    lwm2m_object_meta_information_t* sensor_object_meta = sensor_object_get_meta();
+    lwm2m_object_t* sensor_object = lwm2m_object_create(3300, true, sensor_object_meta);
+    lwm2m_list_t* sensor_object_instances = sensor_object_create_instances();
+    lwm2m_object_res_item_t* resP = &sensor_object_meta->ressources[0];
+    temp_value = (double*)((char*)sensor_object_instances + resP->struct_member_offset);
+
+    
+    lwm2m_object_instances_add(sensor_object, sensor_object_instances);
+    lwm2m_add_object(client_context, sensor_object);
+
     lwm2m_object_t* test_object = lwm2m_object_create(5850, true, led_object_get_meta());
     lwm2m_object_instances_add(test_object, led_object_create_instances());
     lwm2m_add_object(client_context, test_object);
@@ -192,7 +215,16 @@ void loop() {
     lwm2m_network_native_sock(client_context, 0);
     lwm2m_network_process(client_context);
 
-    long t = millis();
-    TempLoop( t );
+    //long t = millis();
+    //TempLoop( t );
+    float tempC = DS18B20.getTempCByIndex(0); //Measuring temperature in Celsius
+    if (*temp_value != tempC) {
+      *temp_value = tempC;
+      Serial.print("TempLoop C: ");
+      Serial.println(tempC);
+    }
+    
+    DS18B20.setWaitForConversion(false); //No waiting for measurement
+    DS18B20.requestTemperatures(); //Initiate the temperature measurement
   }
  

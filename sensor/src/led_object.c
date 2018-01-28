@@ -47,7 +47,7 @@ OBJECT_META(test_object_instance_t, test_object_meta, test_object_write_verify_c
 );
 
 lwm2m_object_meta_information_t *led_object_get_meta() {
-    return &test_object_meta;
+    return test_object_meta;
 }
 
 lwm2m_list_t* led_object_create_instances() {
