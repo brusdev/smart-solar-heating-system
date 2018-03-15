@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" configuration-policy="require" deactivate="deactivate" enabled="true" immediate="false" modified="updated" name="eu.bruscino.dev.sshs.gateway">
+   <implementation class="eu.bruscino.dev.sshs.gateway.Gateway"/>
+   <property name="mqtt.broker" type="String" value="value"/>
+   <property name="mqtt.username" type="String" value="value"/>
+   <property name="mqtt.password" type="String" value="value"/>
+   <property name="mqtt.topic" type="String" value="value"/>
+   <property name="switch.pin" type="String" value="value"/>
+   <service>
+      <provide interface="org.eclipse.kura.configuration.ConfigurableComponent"/>
+   </service>
+</scr:component>
