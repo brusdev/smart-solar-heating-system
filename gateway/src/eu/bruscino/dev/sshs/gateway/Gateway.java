@@ -163,7 +163,8 @@ public class Gateway implements ConfigurableComponent {
 										.getContent();
 
 								JsonObject jsonMessage = Json.createObjectBuilder()
-										.add("temperature", (Float) responseContent.getValue()).build();
+										.add("device-id", (Integer) responseContent.getValue()).build();
+										.add("temperature", (Integer) responseContent.getValue()).build();
 
 								String messageContent = jsonMessage.toString();
 
