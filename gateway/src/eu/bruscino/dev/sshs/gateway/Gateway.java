@@ -63,8 +63,11 @@ public class Gateway implements ConfigurableComponent {
 	private static final String mqtt_username_property= "mqtt.username";
 	private static final String mqtt_password_property= "mqtt.password";
 	private static final String mqtt_topic_temperature_property= "mqtt.topic.temparature";
-	private static final String mqtt_topic_switch_property= "mqtt.topic.switch";
-	private static final String switch_pin_property= "switch.pin";
+	private static final String mqtt_topic_forecast_property= "mqtt.topic.forecast";
+	private static final String switch_pin_boiler_property= "switch.pin.boiler";
+	private static final String switch_pin_utility_property= "switch.pin.utility";
+	private static final String temperature_threshold_boiler_property= "temperature.threshold.boiler";
+	private static final String temperature_threshold_utility_property= "temperature.threshold.utility";
 	
 	private static final int coap_port = 5683;
 	private static final int coaps_port = 5684;
@@ -99,7 +102,10 @@ public class Gateway implements ConfigurableComponent {
 	private GPIOService gpioService;
 	private ServiceTrackerCustomizer<GPIOService, GPIOService> gpioServiceTrackerCustomizer;
 	private ServiceTracker<GPIOService, GPIOService> gpioServiceTracker;
-	private String switchPin;
+	private String switchPinBoiler;
+	private String switchPinUtility;
+	private int temperatureThresholdBoiler;
+	private int temperatureThresholdUtility;
 	    
 	private LeshanServer lwServer;
 	private SensorRegistrationListener sensorRegistrationListener;
@@ -109,7 +115,7 @@ public class Gateway implements ConfigurableComponent {
 	private String mqttUsername;
 	private String mqttPassword;
 	private String mqttTopicTemperature;
-	private String mqttTopicSwitch;
+	private String mqttTopicForecast;
 
     private final class GPIOServiceTrackerCustomizer implements ServiceTrackerCustomizer<GPIOService, GPIOService> {
 
@@ -155,16 +161,21 @@ public class Gateway implements ConfigurableComponent {
 							ReadRequest request = new ReadRequest(contentFormat, target);
 							ReadResponse response = lwServer.send(registration, request, 5000);
 
-							s_logger.info(response.getContent().toString());
+							LwM2mSingleResource responseContent = (LwM2mSingleResource) response
+									.getContent();
+							
+							s_logger.info(responseContent.toString());
+							
+							if ((int)responseContent.getValue() > temperatureThresholdBoiler) {
+								gpioService.getPinByName(switchPinBoiler).setValue(false);
+					        } else {
+								gpioService.getPinByName(switchPinBoiler).setValue(false);
+					        }
 
 							try {
-
-								LwM2mSingleResource responseContent = (LwM2mSingleResource) response
-										.getContent();
-
 								JsonObject jsonMessage = Json.createObjectBuilder()
-										.add("device-id", (Integer) responseContent.getValue()).build();
-										.add("temperature", (Integer) responseContent.getValue()).build();
+										.add("device-id", registration.getEndpoint())
+										.add("temperature", (int)responseContent.getValue()).build();
 
 								String messageContent = jsonMessage.toString();
 
@@ -185,7 +196,7 @@ public class Gateway implements ConfigurableComponent {
 						} else {
 							s_logger.info("Bad updatedReg");
 						}
-					} catch (RuntimeException | InterruptedException e) {
+					} catch (Exception e) {
 						// s_logger.error(e.toString());
 						StringWriter sw = new StringWriter();
 						e.printStackTrace(new PrintWriter(sw));
@@ -221,8 +232,11 @@ public class Gateway implements ConfigurableComponent {
 			mqttUsername = properties.get(mqtt_username_property).toString();
 			mqttPassword = properties.get(mqtt_password_property).toString();
 			mqttTopicTemperature = properties.get(mqtt_topic_temperature_property).toString();
-			mqttTopicSwitch = properties.get(mqtt_topic_switch_property).toString();
-			switchPin = properties.get(switch_pin_property).toString();
+			mqttTopicForecast = properties.get(mqtt_topic_forecast_property).toString();
+			switchPinBoiler = properties.get(switch_pin_boiler_property).toString();
+			switchPinUtility = properties.get(switch_pin_utility_property).toString();
+			temperatureThresholdBoiler = Integer.parseInt(properties.get(temperature_threshold_boiler_property).toString());
+			temperatureThresholdUtility = Integer.parseInt(properties.get(temperature_threshold_utility_property).toString());
 			
 			initMqttClient();
 			
@@ -291,10 +305,16 @@ public class Gateway implements ConfigurableComponent {
 		        JsonObject switchObject = reader.readObject();
 		         
 		        reader.close();
-				
-		        boolean switchValue = switchObject.getBoolean("value");
-				
-				gpioService.getPinByName(switchPin).setValue(switchValue);
+
+		        String switchPin;
+		        String deviceId = switchObject.getString("device-id");
+		        int temperature = switchObject.getInt("temperature");
+		        
+		        if (temperature > temperatureThresholdUtility) {
+					gpioService.getPinByName(switchPinUtility).setValue(false);
+		        } else {
+					gpioService.getPinByName(switchPinUtility).setValue(false);
+		        }
 			}
 			
 			@Override
@@ -306,7 +326,7 @@ public class Gateway implements ConfigurableComponent {
 			}
 		});
 		
-		mqttClient.subscribe(mqtt_topic_switch_property);
+		mqttClient.subscribe(mqttTopicForecast);
 	}
 	
     private void initLwM2mServer() {

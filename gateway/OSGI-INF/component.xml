@@ -4,8 +4,12 @@
    <property name="mqtt.broker" type="String" value="value"/>
    <property name="mqtt.username" type="String" value="value"/>
    <property name="mqtt.password" type="String" value="value"/>
-   <property name="mqtt.topic" type="String" value="value"/>
-   <property name="switch.pin" type="String" value="value"/>
+   <property name="mqtt.topic.forecast" type="String" value="value"/>
+   <property name="mqtt.topic.temperature" type="String" value="value"/>
+   <property name="switch.pin.boiler" type="String" value="value"/>
+   <property name="switch.pin.utility" type="String" value="value"/>
+   <property name="temperature.threshold.boiler" type="String" value="value"/>
+   <property name="temperature.threshold.utility" type="String" value="value"/>
    <service>
       <provide interface="org.eclipse.kura.configuration.ConfigurableComponent"/>
    </service>
