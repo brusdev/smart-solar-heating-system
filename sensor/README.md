@@ -1,6 +1,6 @@
 The sensor uses an ESP8266 board with the protocol Lightweight M2M to communicate the temperature read by DS18B20 to the gateway. The sources of the project are available on GitHub: https://github.com/brusdev/smart-solar-heating-system/tree/master/sensor
 
-![Sensor Photo](images/sensor_photo.jpg)
+![Sensor Photo](../images/sensor_photo.jpg)
 
 ## ESP8266
 The ESP8266 is a low-cost Wi-Fi microchip with full TCP/IP stack and microcontroller capability produced by Espressif Systems. The avalability of same SDK allows the chip to be programmed, removing the need for a separate microcontroller. To program the microchip i use the SDK Arduino core for ESP8266 WiFi chip and PlatformIO, that is an open source ecosystem for IoT development.
