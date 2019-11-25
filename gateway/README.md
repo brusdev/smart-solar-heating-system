@@ -2,20 +2,6 @@ The gateway uses a Raspberry Pi with Eclipse Kura to run the application that co
 
 ![Gateway Photo](../images/gateway_photo.jpg)
 
-## Eclipse Kura
-Eclipse Kura offers a platform that can live at the boundary between the private device network and the local network, public Internet or cellular network providing a manageable and intelligent gateway for that boundary capable of running applications that can harvest locally gathered information and deliver it reliably to the cloud.
-Eclipse Kura can be installed on a Raspberry Pi but it requires Raspbian, gdebi and OpenJDK. You can find the detailed instrucions on official web site: https://eclipse.github.io/kura/intro/raspberry-pi-quick-start.html
-The Kura development environment may be installed on a Windows, Linux, or Mac OS. The setup instructions will be the same across OSs though each system may have unique characteristics. Eclipse Kura Development Environment consists of the following components: JVM (Java JDK SE 8 or Open JDK 8), Eclipse IDE, Kura Workspace. You can find the detailed instrucions on official web site: https://eclipse.github.io/kura/dev/kura-setup.html
-The GPIOService may be used to access the gpio pins that control the relay board but to add a reference to GPIOService int the component definition.
-
-```Xml
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="eu.bruscino.dev.sshs.gateway">
-   <implementation class="eu.bruscino.dev.sshs.gateway.Executor"/>
-   <reference bind="bindGPIOService" cardinality="1..n" interface="org.eclipse.kura.gpio.GPIOService" name="GPIOService" policy="dynamic" unbind="unbindGPIOService"/>
-</scr:component>
-```
-
 ## Eclipse Leshan
 Eclipse Leshan is an OMA Lightweight M2M (LWM2M) implementation in Java. Leshan relies on the Eclipse Californium project for the CoAP and DTLS implementation and provides libraries which help people to develop their own Lightweight M2M server and client.
 The project also provides a client, a server and a bootstrap server demonstration as an example of the Leshan API and for testing purpose.
@@ -39,23 +25,10 @@ builder.setObjectModelProvider(modelProvider);
 logger.info("Build LeshanServer");
 lwServer = builder.build();
 
-lwServer.getRegistrationService().addListener(new RegistrationListener() {
-  @Override
-  public void registered(Registration reg, Registration previousReg, Collection<Observation> previousObsersations) {
-    logger.info(reg.getId() + "@" + reg.getEndpoint() + " registered");
-  }
-  
-  @Override
-  public void unregistered(Registration reg, Collection<Observation> observations, boolean expired, Registration newReg) {
-    logger.info(reg.getId() + "@" + reg.getEndpoint() + " unregistered");
-  }
+// Add a listener
+lwServer.getRegistrationService().addListener(...);
 
-  @Override
-  public void updated(RegistrationUpdate update, Registration updatedReg, Registration previousReg) {
-    logger.info(updatedReg.getId() + "@" + updatedReg.getEndpoint() + " updated");
-  }
-});
-
+//Start the server
 try {
   logger.info("Start LeshanServer");
   lwServer.start();
@@ -77,3 +50,23 @@ mqttConnectOptions.setCleanSession(true);
 mqttConnectOptions.setUserName(mqttUsername);
 mqttConnectOptions.setPassword(mqttPassword.toCharArray());
 ```
+
+## Eclipse Kura
+Eclipse Kura offers a platform that can live at the boundary between the private device network and the local network, public Internet or cellular network providing a manageable and intelligent gateway for that boundary capable of running applications that can harvest locally gathered information and deliver it reliably to the cloud.
+Eclipse Kura can be installed on a Raspberry Pi but it requires Raspbian, gdebi and OpenJDK. You can find the detailed instrucions on [Raspberry Pi Quick Start](https://eclipse.github.io/kura/intro/raspberry-pi-quick-start.html).
+The Kura development environment may be installed on a Windows, Linux, or Mac OS. The setup instructions will be the same across OSs though each system may have unique characteristics. Eclipse Kura Development Environment consists of the following components: JVM (Java JDK SE 8 or Open JDK 8), Eclipse IDE, Kura Workspace. You can find the detailed instrucions on [Getting Started](https://eclipse.github.io/kura/dev/kura-setup.html).
+
+The GPIOService may be used to access the gpio pins that control the relay board adding a reference to GPIOService int the component definition.
+
+```Xml
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="eu.bruscino.dev.sshs.gateway">
+   <implementation class="eu.bruscino.dev.sshs.gateway.Executor"/>
+   <reference bind="bindGPIOService" cardinality="1..n" interface="org.eclipse.kura.gpio.GPIOService" name="GPIOService" policy="dynamic" unbind="unbindGPIOService"/>
+</scr:component>
+```
+
+The kura deployment package can be created with the Eclipse IDE (following the instructions on [Hello World Example](https://eclipse.github.io/kura/dev/hello-example.html)) or with maven:
+* Download the Kura User Workspace from [Eclipse Kura download page](https://www.eclipse.org/kura/downloads.php).
+* Unzip the Kura User Workspace `unzip ~/Downloads/user_workspace_archive_4.1.0.zip -d ~/Downloads/user_workspace_archive_4.1.0`
+* Execute the maven command `mvn clean package`

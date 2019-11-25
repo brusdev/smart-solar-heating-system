@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>eu.bruscino.dev.sshs.gateway</groupId>
+  <artifactId>sshs-gateway</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
+
+  <properties>
+    <kura.user.worksapce>${user.home}/Downloads/user_workspace_archive_4.1.0</kura.user.worksapce>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>p2-repo</id>
+      <layout>p2</layout>
+      <url>file:///${kura.user.worksapce}/target-definition/equinox_3.12.50/repository/</url>
+    </repository>
+    <repository>
+      <id>p2-repo-common</id>
+      <layout>p2</layout>
+      <url>file:///${kura.user.worksapce}/target-definition/common/repository/</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>de.dentrassi.maven</groupId>
+        <artifactId>osgi-dp</artifactId>
+        <version>0.4.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

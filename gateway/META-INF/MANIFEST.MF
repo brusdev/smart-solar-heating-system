@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ActivationPolicy: lazy
 Bundle-ManifestVersion: 2
 Bundle-Name: Smart Solar Heating System Gateway
-Bundle-SymbolicName: eu.bruscino.dev.sshs.gateway
+Bundle-SymbolicName: sshs-gateway
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: eu.bruscino.dev.sshs.gateway
