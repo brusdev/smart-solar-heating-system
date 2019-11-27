@@ -114,7 +114,7 @@ public class SparkApp {
       final Broadcast<String> weatherUrlBroadcast = streamingContext.sparkContext().broadcast(weatherUrl);
 
       JavaDStream<String> tankTemperatureStream = streamingContext.receiverStream(
-         new MqttReceiver(StorageLevel.MEMORY_ONLY(), brokerUrl, clientPrefixOption + "Receiver",
+         new MqttReceiver(StorageLevel.MEMORY_ONLY(), brokerUrl, clientPrefix + "Receiver",
                           username, password, topic + "/tank/temperature"));
 
       JavaDStream<InputData> inputDataStream = tankTemperatureStream.map((Function<String, InputData>) tankTemperatureString -> {
